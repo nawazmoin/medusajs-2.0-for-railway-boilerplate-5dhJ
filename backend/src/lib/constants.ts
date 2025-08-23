@@ -85,6 +85,14 @@ export const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
 /**
+ * (optional) PayPal configuration
+ * PAYPAL_ENVIRONMENT should be either 'sandbox' or 'live'
+ */
+export const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+export const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
+export const PAYPAL_ENVIRONMENT = process.env.PAYPAL_ENVIRONMENT || process.env.PAYPAL_ENV; // 'sandbox' | 'live'
+
+/**
  * (optional) Meilisearch configuration
  */
 export const MEILISEARCH_HOST = process.env.MEILISEARCH_HOST;
