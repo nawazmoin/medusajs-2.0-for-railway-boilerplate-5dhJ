@@ -1,10 +1,9 @@
 "use client"
 
 import { loadStripe } from "@stripe/stripe-js"
-import React from "react"
+import React, { createContext, useMemo } from "react"
 import StripeWrapper from "./stripe-wrapper"
 import { PayPalScriptProvider } from "@paypal/react-paypal-js"
-import { createContext } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { isPaypal, isStripe } from "@lib/constants"
 
@@ -13,27 +12,55 @@ type WrapperProps = {
   children: React.ReactNode
 }
 
-export const StripeContext = createContext(false)
-
+// Stripe
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_KEY
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null
 
+// PayPal
 const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
 
-const Wrapper: React.FC<WrapperProps> = ({ cart, children }) => {
-  const paymentSession = cart.payment_collection?.payment_sessions?.find(
-    (s) => s.status === "pending"
+// Contexts
+export const StripeContext = createContext(false)
+export const PayPalOrderContext = createContext<string | null>(null)
+
+export default function Wrapper({ cart, children }: WrapperProps) {
+  const sessions = cart?.payment_collection?.payment_sessions ?? []
+
+  // pick sessions explicitly
+  const stripeSession = useMemo(
+    () => sessions.find((s) => isStripe(s.provider_id)),
+    [sessions]
   )
 
-  if (
-    isStripe(paymentSession?.provider_id) &&
-    paymentSession &&
-    stripePromise
-  ) {
+  const paypalSession = useMemo(
+    () => sessions.find((s) => isPaypal(s.provider_id)),
+    [sessions]
+  )
+
+  // extract PayPal order id (provider may use one of these keys)
+  const paypalOrderId =
+    (paypalSession?.data as any)?.paypalOrderId ??
+    (paypalSession?.data as any)?.order_id ??
+    (paypalSession?.data as any)?.id ??
+    null
+
+  // memoize SDK options to prevent reloading (flicker)
+  const paypalOptions = useMemo(
+    () => ({
+      "client-id": paypalClientId!,                         // require a real ID
+      intent: "authorize",                                  // match backend
+      currency: cart?.currency_code?.toUpperCase() ?? "EUR",
+      components: "buttons",
+    }),
+    [paypalClientId, cart?.currency_code]
+  )
+
+  // Stripe branch
+  if (stripeSession && stripePromise) {
     return (
       <StripeContext.Provider value={true}>
         <StripeWrapper
-          paymentSession={paymentSession}
+          paymentSession={stripeSession}
           stripeKey={stripeKey}
           stripePromise={stripePromise}
         >
@@ -43,26 +70,16 @@ const Wrapper: React.FC<WrapperProps> = ({ cart, children }) => {
     )
   }
 
-  if (
-    isPaypal(paymentSession?.provider_id) &&
-    paypalClientId !== undefined &&
-    cart
-  ) {
+  // PayPal branch
+  if (paypalSession && paypalClientId) {
     return (
-      <PayPalScriptProvider
-        options={{
-          "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
-          currency: cart?.currency_code.toUpperCase(),
-          intent: "authorize",
-          components: "buttons",
-        }}
-      >
-        {children}
+      <PayPalScriptProvider options={paypalOptions}>
+        <PayPalOrderContext.Provider value={paypalOrderId}>
+          {children}
+        </PayPalOrderContext.Provider>
       </PayPalScriptProvider>
     )
   }
 
-  return <div>{children}</div>
+  return <>{children}</>
 }
-
-export default Wrapper
