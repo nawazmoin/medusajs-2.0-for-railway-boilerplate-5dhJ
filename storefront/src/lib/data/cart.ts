@@ -10,6 +10,10 @@ import { getAuthHeaders, getCartId, removeCartId, setCartId } from "./cookies"
 import { getProductsById } from "./products"
 import { getRegion } from "./regions"
 
+const BACKEND = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+const PUBLISHABLE = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
+
 export async function retrieveCart() {
   const cartId = getCartId()
 
@@ -146,50 +150,52 @@ export async function deleteLineItem(lineId: string) {
 }
 
 export async function enrichLineItems(
-  lineItems:
-    | HttpTypes.StoreCartLineItem[]
-    | HttpTypes.StoreOrderLineItem[]
-    | null,
+  items: HttpTypes.StoreOrder["items"],
   regionId: string
-) {
-  if (!lineItems) return []
+): Promise<HttpTypes.StoreOrder["items"]> {
+  if (!BACKEND || !PUBLISHABLE) return items
 
-  // Prepare query parameters
-  const queryParams = {
-    ids: lineItems.map((lineItem) => lineItem.product_id!),
-    regionId: regionId,
-  }
+  try {
+    const variantIds = items
+      .map((i) => i.variant_id)
+      .filter(Boolean) as string[]
 
-  // Fetch products by their IDs
-  const products = await getProductsById(queryParams)
-  // If there are no line items or products, return an empty array
-  if (!lineItems?.length || !products) {
-    return []
-  }
+    if (variantIds.length === 0) return items
 
-  // Enrich line items with product and variant information
-  const enrichedItems = lineItems.map((item) => {
-    const product = products.find((p: any) => p.id === item.product_id)
-    const variant = product?.variants?.find(
-      (v: any) => v.id === item.variant_id
-    )
+    // Fetch variants in bulk (region-aware for pricing if you need it)
+    const url = new URL(`${BACKEND}/store/variants`)
+    url.searchParams.set("ids", variantIds.join(","))
+    url.searchParams.set("region_id", regionId)
 
-    // If product or variant is not found, return the original item
-    if (!product || !variant) {
-      return item
+    const res = await fetch(url.toString(), {
+      headers: { "x-publishable-api-key": PUBLISHABLE },
+      cache: "no-store",
+    })
+
+    if (!res.ok) {
+      console.warn("enrichLineItems: variants fetch not ok")
+      return items
     }
 
-    // If product and variant are found, enrich the item
-    return {
-      ...item,
-      variant: {
-        ...variant,
-        product: omit(product, "variants"),
-      },
-    }
-  }) as HttpTypes.StoreCartLineItem[]
+    const data = (await res.json()) as any
+    const byId = new Map<string, any>()
+    for (const v of data.variants ?? []) byId.set(v.id, v)
 
-  return enrichedItems
+    // Merge back lightweight fields you show on the confirmation page
+    return items.map((it) => {
+      const v = it.variant_id ? byId.get(it.variant_id) : null
+      if (!v) return it
+      return {
+        ...it,
+        // fallbacks keep original item data intact
+        title: it.title ?? v.product?.title ?? it.title,
+        thumbnail: (it as any).thumbnail ?? v.product?.thumbnail ?? (it as any).thumbnail,
+      }
+    })
+  } catch (e) {
+    console.error("enrichLineItems error:", e)
+    return items
+  }
 }
 
 export async function setShippingMethod({
