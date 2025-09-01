@@ -19,7 +19,7 @@
   Prebaked medusajs 2.0 monorepo
 </h2>
 <h4 align="center">
-  Backend + Storefront + postgres + redis + MinIO + MeiliSearch
+  Backend + Storefront + postgres + redis + MinIO + MeiliSearch .
 </h4>
 
 <h2 align="center">
