@@ -1,34 +1,58 @@
-import { Github } from "@medusajs/icons"
-import { Button, Heading } from "@medusajs/ui"
+"use client"
+
+import Image from "next/image"
+import Link from "next/link"
+// swap to your actual path if different
+import coverImage from "../../../../images/coverImage_4K_sharp_cinematic.png"
 
 const Hero = () => {
   return (
-    <div className="h-[75vh] w-full border-b border-ui-border-base relative bg-ui-bg-subtle">
-      <div className="absolute inset-0 z-10 flex flex-col justify-center items-center text-center small:p-32 gap-6">
-        <span>
-          <Heading
-            level="h1"
-            className="text-3xl leading-10 text-ui-fg-base font-normal"
-          >
-            Well done! You have successfully deployed your Medusa 2.0 store on Railway!
-          </Heading>
-          <Heading
-            level="h2"
-            className="text-3xl leading-10 text-ui-fg-subtle font-normal"
-          >
-            Need help customizing your store?
-          </Heading>
-        </span>
-        <a
-          href="https://funkyton.com/medusajs-2-0-is-finally-here/"
-          target="_blank"
-        >
-          <h1 style={{ textDecoration: "underline" }}>
-            Visit the tutorial
+    <section className="relative w-full overflow-hidden border-b border-ui-border-base">
+      <div className="relative min-h-[62svh] md:min-h-[72svh] lg:min-h-[82svh]">
+        {/* Background image */}
+        <Image
+          src={coverImage}
+          alt="Neue Kollektion"
+          priority
+          fill
+          sizes="100vw"
+          className="object-cover object-[70%_center] md:object-[60%_center]"
+        />
+
+        {/* Soft left gradient for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/50 to-transparent md:from-white/50" />
+
+        {/* Content block */}
+        <div className="absolute inset-x-4 sm:inset-x-8 md:left-12 md:right-auto top-1/2 -translate-y-1/2 max-w-xl">
+          <div className="inline-flex items-center rounded-full bg-black/80 px-3 py-1 text-[11px] tracking-widest text-white">
+            NEW KOLLEKTION
+          </div>
+
+          <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight text-gray-900">
+            Inspiration. Auswahl. Überraschung.
           </h1>
-        </a>
+
+          <p className="mt-3 text-sm sm:text-base text-gray-700">
+            Elegante Silhouetten und satte Töne für die neue Saison.
+          </p>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/store?sort=new"
+              className="inline-flex items-center rounded-full bg-black px-5 py-3 text-sm font-medium text-white hover:bg-gray-900"
+            >
+              Jetzt entdecken
+            </Link>
+            <Link
+              href="/store"
+              className="inline-flex items-center rounded-full px-5 py-3 text-sm font-medium ring-1 ring-black/15 hover:bg-black/5"
+            >
+              Alle Produkte
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 

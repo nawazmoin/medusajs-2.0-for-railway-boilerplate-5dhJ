@@ -16,7 +16,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
   return (
     <div>
       <Text>
-        We have sent the order confirmation details to{" "}
+        Wir haben die Bestellbestätigungsdetails an{" "}
         <span
           className="text-ui-fg-medium-plus font-semibold"
           data-testid="order-email"
@@ -26,7 +26,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
         .
       </Text>
       <Text className="mt-2">
-        Order date:{" "}
+        Bestelldatum:{" "}
         <span data-testid="order-date">
           {new Date(order.created_at).toDateString()}
         </span>
@@ -46,7 +46,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
               </span>
             </Text>
             <Text>
-              Payment status:{" "}
+              Zahlungsstatus:{" "}
               <span
                 className="text-ui-fg-subtle "
                 sata-testid="order-payment-status"

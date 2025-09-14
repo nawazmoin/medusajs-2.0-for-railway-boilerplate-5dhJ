@@ -1,108 +1,202 @@
 "use client"
 
-import { Popover, Transition } from "@headlessui/react"
-import { ArrowRightMini, XMark } from "@medusajs/icons"
+import { Fragment, useState } from "react"
+import { Dialog, Transition } from "@headlessui/react"
+import {
+  XMark,
+  ChevronRightMini,
+  MagnifyingGlass,
+  ShoppingBag,
+  ArrowRightMini,
+} from "@medusajs/icons"
 import { Text, clx, useToggleState } from "@medusajs/ui"
-import { Fragment } from "react"
-
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
 import { HttpTypes } from "@medusajs/types"
 
-const SideMenuItems = {
-  Home: "/",
-  Store: "/store",
-  Search: "/search",
-  Account: "/account",
-  Cart: "/cart",
+type Props = {
+  regions: HttpTypes.StoreRegion[] | null
+  cartCount?: number
+  logo?: React.ReactNode // pass your logo component if you want
 }
 
-const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
-  const toggleState = useToggleState()
+/**
+ * Responsive slide-in menu (Kavinn-style):
+ * - Mobile: full screen
+ * - ≥sm: left sheet with fixed max width
+ * - Row separators, chevrons on items with children
+ * - Top bar: Close · Search · Logo · Cart
+ * - Footer: CountrySelect + ©, Auth link
+ */
+const SideMenu = ({ regions, cartCount = 0, logo }: Props) => {
+  const [open, setOpen] = useState(false)
+  const regionToggle = useToggleState()
 
+  // Configure your menu here (use hasChildren to show chevron)
+  const ITEMS: { label: string; href: string; hasChildren?: boolean }[] = [
+    { label: "🔥 SALE", href: "/collections/sale" },
+    { label: "Personalisierte Geschenke", href: "/collections/personalisierte-geschenke" },
+    { label: "Baby und Kindergeschenke", href: "/collections/baby-und-kindergeschenke" },
+    { label: "Frauengeschenke", href: "/collections/frauengeschenke" },
+    { label: "Männergeschenke", href: "/collections/männergeschenke" },
+    { label: "Anlassgeschenke", href: "/collections/anlassgeschenke" },
+    { label: "Gastgeschenke", href: "/collections/gastgeschenke" },
+    { label: "Kundeninspirationen", href: "/collections/kundeninspirationen" },
+    { label: "Weitere Geschenke", href: "/collections/weitere-geschenke" },
+  ]
   return (
-    <div className="h-full">
-      <div className="flex items-center h-full">
-        <Popover className="h-full flex">
-          {({ open, close }) => (
-            <>
-              <div className="relative flex h-full">
-                <Popover.Button
-                  data-testid="nav-menu-button"
-                  className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
+    <>
+      {/* Trigger – put this in your header */}
+      <button
+        type="button"
+        aria-label="Open menu"
+        onClick={() => setOpen(true)}
+        className="h-full px-3 text-ui-fg-subtle hover:text-ui-fg-base"
+      >
+        Menü
+      </button>
+
+      <Transition show={open} as={Fragment}>
+        <Dialog onClose={setOpen} className="relative z-50">
+          {/* Backdrop */}
+          <Transition.Child
+            as={Fragment}
+            enter="transition-opacity ease-out duration-200"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity ease-in duration-150"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+          </Transition.Child>
+
+          {/* Panel (left sheet) */}
+          <Transition.Child
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="-translate-x-full opacity-0"
+            enterTo="translate-x-0 opacity-100"
+            leave="transition ease-in duration-150"
+            leaveFrom="translate-x-0 opacity-100"
+            leaveTo="-translate-x-full opacity-0"
+          >
+            <Dialog.Panel
+              className={clx(
+                "fixed inset-y-0 left-0 flex h-full w-full flex-col bg-white text-ui-fg-base shadow-2xl",
+                "sm:max-w-[520px] md:max-w-[560px]" // wide phones/tablets get a nice sheet width
+              )}
+            >
+              {/* Top bar */}
+              <div className="flex items-center justify-between px-5 py-4">
+                <div className="flex items-center gap-4">
+                  <button
+                    aria-label="Close menu"
+                    onClick={() => setOpen(false)}
+                    className="p-2 -m-2"
+                  >
+                    <XMark />
+                  </button>
+
+                  <LocalizedClientLink
+                    href="/search"
+                    className="p-2 -m-2 hover:text-ui-fg-subtle"
+                    onClick={() => setOpen(false)}
+                  >
+                    <MagnifyingGlass />
+                  </LocalizedClientLink>
+                </div>
+
+                <div className="select-none text-xl tracking-wide">
+                  {logo ?? (
+                    <LocalizedClientLink
+                      href="/"
+                      className="font-medium"
+                      onClick={() => setOpen(false)}
+                    >
+                      Art&nbsp;of&nbsp;Gifts
+                    </LocalizedClientLink>
+                  )}
+                </div>
+
+                <LocalizedClientLink
+                  href="/cart"
+                  className="relative p-2 -m-2 hover:text-ui-fg-subtle"
+                  onClick={() => setOpen(false)}
                 >
-                  Menu
-                </Popover.Button>
+                  <ShoppingBag />
+                  {cartCount > 0 && (
+                    <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-ui-bg-interactive text-[10px] font-medium text-ui-fg-on-color">
+                      {cartCount}
+                    </span>
+                  )}
+                </LocalizedClientLink>
               </div>
 
-              <Transition
-                show={open}
-                as={Fragment}
-                enter="transition ease-out duration-150"
-                enterFrom="opacity-0"
-                enterTo="opacity-100 backdrop-blur-2xl"
-                leave="transition ease-in duration-150"
-                leaveFrom="opacity-100 backdrop-blur-2xl"
-                leaveTo="opacity-0"
-              >
-                <Popover.Panel className="flex flex-col absolute w-full pr-4 sm:pr-0 sm:w-1/3 2xl:w-1/4 sm:min-w-min h-[calc(100vh-1rem)] z-30 inset-x-0 text-sm text-ui-fg-on-color m-2 backdrop-blur-2xl">
-                  <div
-                    data-testid="nav-menu-popup"
-                    className="flex flex-col h-full bg-[rgba(3,7,18,0.5)] rounded-rounded justify-between p-6"
-                  >
-                    <div className="flex justify-end" id="xmark">
-                      <button data-testid="close-menu-button" onClick={close}>
-                        <XMark />
-                      </button>
-                    </div>
-                    <ul className="flex flex-col gap-6 items-start justify-start">
-                      {Object.entries(SideMenuItems).map(([name, href]) => {
-                        return (
-                          <li key={name}>
-                            <LocalizedClientLink
-                              href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
-                              onClick={close}
-                              data-testid={`${name.toLowerCase()}-link`}
-                            >
-                              {name}
-                            </LocalizedClientLink>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                    <div className="flex flex-col gap-y-6">
-                      <div
-                        className="flex justify-between"
-                        onMouseEnter={toggleState.open}
-                        onMouseLeave={toggleState.close}
-                      >
-                        {regions && (
-                          <CountrySelect
-                            toggleState={toggleState}
-                            regions={regions}
-                          />
+              {/* Divider */}
+              <hr className="border-ui-border" />
+
+              {/* Scroll area with menu items */}
+              <nav className="flex-1 overflow-y-auto">
+                <ul className="divide-y divide-ui-border">
+                  {ITEMS.map((item) => (
+                    <li key={item.label}>
+                      <LocalizedClientLink
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        className={clx(
+                          "flex items-center justify-between px-5 py-4",
+                          "text-base tracking-wide hover:bg-ui-bg-subtle"
                         )}
-                        <ArrowRightMini
-                          className={clx(
-                            "transition-transform duration-150",
-                            toggleState.state ? "-rotate-90" : ""
-                          )}
-                        />
-                      </div>
-                      <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} Medusa Store. All rights
-                        reserved.
-                      </Text>
-                    </div>
-                  </div>
-                </Popover.Panel>
-              </Transition>
-            </>
-          )}
-        </Popover>
-      </div>
-    </div>
+                      >
+                        <span>{item.label}</span>
+                        {item.hasChildren && (
+                          <ChevronRightMini className="shrink-0" />
+                        )}
+                      </LocalizedClientLink>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              {/* Footer */}
+              <div className="mt-auto border-t border-ui-border px-5 py-5 space-y-5">
+                <div
+                  className="flex items-center justify-between"
+                  onMouseEnter={regionToggle.open}
+                  onMouseLeave={regionToggle.close}
+                >
+                  {regions && (
+                    <CountrySelect
+                      toggleState={regionToggle}
+                      regions={regions}
+                    />
+                  )}
+                  <ArrowRightMini
+                    className={clx(
+                      "transition-transform duration-150",
+                      regionToggle.state ? "-rotate-90" : ""
+                    )}
+                  />
+                </div>
+
+                <LocalizedClientLink
+                  href="/account"
+                  onClick={() => setOpen(false)}
+                  className="block text-sm underline underline-offset-4 hover:text-ui-fg-subtle"
+                >
+                  Registrieren / Anmelden
+                </LocalizedClientLink>
+
+                <Text className="txt-compact-small text-ui-fg-muted">
+                  © {new Date().getFullYear()} Art of Gifts. Alle Rechte vorbehalten.
+                </Text>
+              </div>
+            </Dialog.Panel>
+          </Transition.Child>
+        </Dialog>
+      </Transition>
+    </>
   )
 }
 

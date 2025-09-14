@@ -30,7 +30,7 @@ const Review = ({ cart }: { cart: any }) => {
             }
           )}
         >
-          Review
+          Überprüfung
         </Heading>
       </div>
       {isOpen && previousStepsCompleted && (
@@ -38,10 +38,10 @@ const Review = ({ cart }: { cart: any }) => {
           <div className="flex items-start gap-x-1 w-full mb-6">
             <div className="w-full">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                By clicking the Place Order button, you confirm that you have
-                read, understand and accept our Terms of Use, Terms of Sale and
-                Returns Policy and acknowledge that you have read Medusa
-                Store&apos;s Privacy Policy.
+                Durch Klicken auf die Schaltfläche „Bestellung aufgeben“ bestätigen Sie, dass Sie
+                unsere Nutzungsbedingungen, Verkaufsbedingungen und
+                Rückgabebedingungen gelesen und verstanden haben und akzeptieren und dass Sie die Datenschutzerklärung von Medusa
+                Store gelesen haben.
               </Text>
             </div>
           </div>

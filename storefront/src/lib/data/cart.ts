@@ -13,21 +13,40 @@ import { getRegion } from "./regions"
 const BACKEND = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 const PUBLISHABLE = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 
+const isCompletedCartError = (e: any) => {
+  const msg = e?.message ?? e?.response?.data?.message ?? e?.toString?.() ?? ""
+  const status = e?.response?.status
+  return /cart.*(completed|archived)/i.test(msg) || status === 409
+}
 
 export async function retrieveCart() {
   const cartId = getCartId()
+  if (!cartId) return null
 
-  if (!cartId) {
+  try {
+    const { cart } = await sdk.store.cart.retrieve(
+      cartId,
+      {},
+      { next: { tags: ["cart"] }, ...getAuthHeaders() }
+    )
+
+    // Guard against completed/archived carts (properties not in type)
+    const completedOrArchived = Boolean(
+      (cart as any)?.completed_at ||
+        (cart as any)?.status === "completed" ||
+        (cart as any)?.status === "archived"
+    )
+    if (completedOrArchived) {
+      return null
+    }
+
+    return cart
+  } catch {
+    // Also no cookie writes here
     return null
   }
-
-  return await sdk.store.cart
-    .retrieve(cartId, {}, { next: { tags: ["cart"] }, ...getAuthHeaders() })
-    .then(({ cart }) => cart)
-    .catch(() => {
-      return null
-    })
 }
+
 
 export async function getOrSetCart(countryCode: string) {
   let cart = await retrieveCart()
@@ -76,35 +95,46 @@ export async function addToCart({
   variantId,
   quantity,
   countryCode,
+  metadata,
 }: {
   variantId: string
   quantity: number
   countryCode: string
+  metadata?: Record<string, unknown>
 }) {
-  if (!variantId) {
-    throw new Error("Missing variant ID when adding to cart")
-  }
+  if (!variantId) throw new Error("Missing variant ID when adding to cart")
 
-  const cart = await getOrSetCart(countryCode)
-  if (!cart) {
-    throw new Error("Error retrieving or creating cart")
-  }
+  let cart = await getOrSetCart(countryCode)
+  if (!cart) throw new Error("Error retrieving or creating cart")
 
-  await sdk.store.cart
-    .createLineItem(
+  const payload = { variant_id: variantId, quantity, metadata } as any
+
+  try {
+    await sdk.store.cart.createLineItem(
       cart.id,
-      {
-        variant_id: variantId,
-        quantity,
-      },
+      payload,
       {},
       getAuthHeaders()
     )
-    .then(() => {
+    revalidateTag("cart")
+  } catch (e) {
+    if (isCompletedCartError(e)) {
+      // Now it's safe to clear cookie (we're in a Server Action)
+      removeCartId()
+      cart = await getOrSetCart(countryCode)
+      await sdk.store.cart.createLineItem(
+        cart.id,
+        payload,
+        {},
+        getAuthHeaders()
+      )
       revalidateTag("cart")
-    })
-    .catch(medusaError)
+      return
+    }
+    throw medusaError(e)
+  }
 }
+
 
 export async function updateLineItem({
   lineId,
@@ -150,19 +180,19 @@ export async function deleteLineItem(lineId: string) {
 }
 
 export async function enrichLineItems(
-  items: HttpTypes.StoreOrder["items"],
+  items: HttpTypes.StoreOrder["items"] | null | undefined,
   regionId: string
 ): Promise<HttpTypes.StoreOrder["items"]> {
-  if (!BACKEND || !PUBLISHABLE) return items
+  const safeItems = Array.isArray(items) ? items : []
+  if (!BACKEND || !PUBLISHABLE) return safeItems as any
 
   try {
-    const variantIds = items
+    const variantIds = safeItems
       .map((i) => i.variant_id)
       .filter(Boolean) as string[]
 
-    if (variantIds.length === 0) return items
+    if (variantIds.length === 0) return safeItems as any
 
-    // Fetch variants in bulk (region-aware for pricing if you need it)
     const url = new URL(`${BACKEND}/store/variants`)
     url.searchParams.set("ids", variantIds.join(","))
     url.searchParams.set("region_id", regionId)
@@ -174,27 +204,37 @@ export async function enrichLineItems(
 
     if (!res.ok) {
       console.warn("enrichLineItems: variants fetch not ok")
-      return items
+      return safeItems as any
     }
 
     const data = (await res.json()) as any
     const byId = new Map<string, any>()
     for (const v of data.variants ?? []) byId.set(v.id, v)
 
-    // Merge back lightweight fields you show on the confirmation page
-    return items.map((it) => {
+    return safeItems.map((it) => {
       const v = it.variant_id ? byId.get(it.variant_id) : null
       if (!v) return it
+      // merge pricing and product media into the line item variant so price components work
+      const mergedVariant = {
+        ...(it as any).variant,
+        ...v,
+        calculated_price: v.calculated_price ?? (it as any).variant?.calculated_price,
+        product: {
+          ...(it as any).variant?.product,
+          ...v.product,
+        },
+      }
       return {
         ...it,
-        // fallbacks keep original item data intact
-        title: it.title ?? v.product?.title ?? it.title,
-        thumbnail: (it as any).thumbnail ?? v.product?.thumbnail ?? (it as any).thumbnail,
+        variant: mergedVariant,
+        title: (it as any).title ?? v.product?.title ?? (it as any).title,
+        thumbnail:
+          (it as any).thumbnail ?? v.product?.thumbnail ?? (it as any).thumbnail,
       }
-    })
+    }) as any
   } catch (e) {
     console.error("enrichLineItems error:", e)
-    return items
+    return safeItems as any
   }
 }
 

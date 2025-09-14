@@ -53,7 +53,7 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
         <Hr style={{ margin: '20px 0' }} />
 
         <Text style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 10px' }}>
-          Shipping Address
+          Lieferadresse
         </Text>
         <Text style={{ margin: '0 0 5px' }}>
           {shippingAddress.address_1}

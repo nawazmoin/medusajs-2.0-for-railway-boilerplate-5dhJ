@@ -1,0 +1,19 @@
+.cover-image {
+    width: 100vw;
+}
+
+.personalised-gift-button {
+    margin-top: 20px;
+    font-weight: bolder;
+    box-shadow: 0 0 0 0 #b22222;
+    background-color: #b22222;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.personalised-gift-button:hover {
+    box-shadow: 0 0 0 0.2 #b22222;
+    padding: 14px 24px;
+    transition: all 0.3s ease-in-out;
+}

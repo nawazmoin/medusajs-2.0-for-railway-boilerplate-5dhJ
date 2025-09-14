@@ -14,11 +14,11 @@ type ProductTabsProps = {
 const ProductTabs = ({ product }: ProductTabsProps) => {
   const tabs = [
     {
-      label: "Product Information",
+      label: "Produktinformationen",
       component: <ProductInfoTab product={product} />,
     },
     {
-      label: "Shipping & Returns",
+      label: "Versand & Rückgabe",
       component: <ShippingInfoTab />,
     },
   ]
@@ -92,7 +92,7 @@ const ShippingInfoTab = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-start gap-x-2">
+        {/* <div className="flex items-start gap-x-2">
           <Refresh />
           <div>
             <span className="font-semibold">Simple exchanges</span>
@@ -112,7 +112,7 @@ const ShippingInfoTab = () => {
               is hassle-free.
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )

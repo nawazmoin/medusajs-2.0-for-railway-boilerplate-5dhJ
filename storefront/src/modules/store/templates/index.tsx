@@ -23,11 +23,16 @@ const StoreTemplate = ({
       className="flex flex-col small:flex-row small:items-start py-6 content-container"
       data-testid="category-container"
     >
-      <RefinementList sortBy={sort} />
-      <div className="w-full">
-        <div className="mb-8 text-2xl-semi">
-          <h1 data-testid="store-page-title">All products</h1>
+
+
+      {/* allow the grid to take the rest */}
+      <div className="w-full min-w-0">
+        {/* make the left filter narrow and non-growing */}
+        <div className="mb-8 flex items-center justify-between">
+          <h4 data-testid="store-page-title" className="text-xl-semi">All products</h4>
+          <RefinementList sortBy={sort} />
         </div>
+
         <Suspense fallback={<SkeletonProductGrid />}>
           <PaginatedProducts
             sortBy={sort}

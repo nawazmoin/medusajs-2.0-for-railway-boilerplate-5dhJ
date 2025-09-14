@@ -35,7 +35,7 @@ const AccountNav = ({
           >
             <>
               <ChevronDown className="transform rotate-90" />
-              <span>Account</span>
+              <span>Konto</span>
             </>
           </LocalizedClientLink>
         ) : (
@@ -110,7 +110,7 @@ const AccountNav = ({
       <div className="hidden small:block" data-testid="account-nav">
         <div>
           <div className="pb-4">
-            <h3 className="text-base-semi">Account</h3>
+            <h3 className="text-base-semi">Konto</h3>
           </div>
           <div className="text-base-regular">
             <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
@@ -120,7 +120,7 @@ const AccountNav = ({
                   route={route!}
                   data-testid="overview-link"
                 >
-                  Overview
+                  Übersicht
                 </AccountNavLink>
               </li>
               <li>
@@ -129,7 +129,7 @@ const AccountNav = ({
                   route={route!}
                   data-testid="profile-link"
                 >
-                  Profile
+                  Profil
                 </AccountNavLink>
               </li>
               <li>
@@ -138,7 +138,7 @@ const AccountNav = ({
                   route={route!}
                   data-testid="addresses-link"
                 >
-                  Addresses
+                  Adressen
                 </AccountNavLink>
               </li>
               <li>
@@ -147,7 +147,7 @@ const AccountNav = ({
                   route={route!}
                   data-testid="orders-link"
                 >
-                  Orders
+                  Bestellungen
                 </AccountNavLink>
               </li>
               <li className="text-grey-700">
@@ -156,7 +156,7 @@ const AccountNav = ({
                   onClick={handleLogout}
                   data-testid="logout-button"
                 >
-                  Log out
+                  Abmelden
                 </button>
               </li>
             </ul>

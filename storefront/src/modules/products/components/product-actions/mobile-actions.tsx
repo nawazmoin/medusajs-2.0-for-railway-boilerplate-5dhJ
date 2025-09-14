@@ -20,6 +20,9 @@ type MobileActionsProps = {
   isAdding?: boolean
   show: boolean
   optionsDisabled: boolean
+  // Added for personalized message
+  message: string
+  setMessage: (val: string) => void
 }
 
 const MobileActions: React.FC<MobileActionsProps> = ({
@@ -32,6 +35,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   isAdding,
   show,
   optionsDisabled,
+  message,
+  setMessage,
 }) => {
   const { state, open, close } = useToggleState()
 
@@ -166,7 +171,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                       <X />
                     </button>
                   </div>
-                  <div className="bg-white px-6 py-12">
+                  <div className="bg-white px-6 py-12 space-y-8">
+                    {/* Options */}
                     {(product.variants?.length ?? 0) > 1 && (
                       <div className="flex flex-col gap-y-6">
                         {(product.options || []).map((option) => {
@@ -184,6 +190,46 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                         })}
                       </div>
                     )}
+
+                    {/* Personalized message */}
+                    <div>
+                      <label
+                        htmlFor="mobile-personalized-message"
+                        className="block text-small-regular text-ui-fg-subtle mb-1"
+                      >
+                        Fügen Sie eine persönliche Nachricht hinzu (optional)
+                      </label>
+                      <textarea
+                        id="mobile-personalized-message"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        rows={4}
+                        placeholder=""
+                        className="w-full rounded-md border border-ui-border-base p-2 text-small-regular focus:outline-none focus:ring-1 focus:ring-ui-fg-base"
+                        maxLength={280}
+                      />
+                      <div className="mt-1 text-xsmall-regular text-ui-fg-muted">
+                        {message.length}/280
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <Button
+                        onClick={() => {
+                          close()
+                          handleAddToCart()
+                        }}
+                        disabled={!inStock || !variant}
+                        className="w-full"
+                        isLoading={isAdding}
+                      >
+                        {!variant
+                          ? "Select variant"
+                          : !inStock
+                          ? "Out of stock"
+                          : "Add to cart"}
+                      </Button>
+                    </div>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

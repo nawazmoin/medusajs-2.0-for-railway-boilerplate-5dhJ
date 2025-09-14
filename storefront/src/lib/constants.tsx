@@ -14,6 +14,10 @@ export const paymentInfoMap: Record<
     title: "Credit card",
     icon: <CreditCard />,
   },
+  "pp_paypal-payment_paypal-payment": {
+    title: "PayPal",
+    icon: <PayPal />,
+  },
   "pp_stripe-ideal_stripe": {
     title: "iDeal",
     icon: <Ideal />,

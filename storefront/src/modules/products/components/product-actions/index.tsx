@@ -36,6 +36,7 @@ export default function ProductActions({
 }: ProductActionsProps) {
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
+  const [message, setMessage] = useState("")
   const countryCode = useParams().countryCode as string
 
   // If there is only 1 variant, preselect the options
@@ -103,9 +104,11 @@ export default function ProductActions({
       variantId: selectedVariant.id,
       quantity: 1,
       countryCode,
+      metadata: message ? { personalized_message: message } : undefined,
     })
 
     setIsAdding(false)
+    setMessage("")
   }
 
   return (
@@ -135,6 +138,23 @@ export default function ProductActions({
 
         <ProductPrice product={product} variant={selectedVariant} />
 
+        {/* Personalized message */}
+        <div className="mt-2">
+          <label htmlFor="personalized-message" className="block text-small-regular text-ui-fg-subtle mb-1">
+            Fügen Sie eine persönliche Nachricht hinzu (optional)
+          </label>
+          <textarea
+            id="personalized-message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={3}
+            placeholder=""
+            className="w-full rounded-md border border-ui-border-base p-2 text-small-regular focus:outline-none focus:ring-1 focus:ring-ui-fg-base"
+            maxLength={280}
+          />
+          <div className="mt-1 text-xsmall-regular text-ui-fg-muted">{message.length}/280</div>
+        </div>
+
         <Button
           onClick={handleAddToCart}
           disabled={!inStock || !selectedVariant || !!disabled || isAdding}
@@ -159,6 +179,8 @@ export default function ProductActions({
           isAdding={isAdding}
           show={!inView}
           optionsDisabled={!!disabled || isAdding}
+          message={message}
+          setMessage={setMessage}
         />
       </div>
     </>

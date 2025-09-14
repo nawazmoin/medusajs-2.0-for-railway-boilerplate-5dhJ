@@ -5,6 +5,9 @@ import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
+import { Gilda_Display } from "next/font/google"
+
+const gilda = Gilda_Display({ weight: "400", subsets: ["latin"], display: "swap" })
 
 export default async function Nav() {
   const regions = await listRegions().then((regions: StoreRegion[]) => regions)
@@ -19,13 +22,14 @@ export default async function Nav() {
             </div>
           </div>
 
-          <div className="flex items-center h-full">
+          <div className="flex items-center h-full" style={{ fontFamily: gilda.style.fontFamily, fontSize:'1.2rem' }}>
             <LocalizedClientLink
               href="/"
-              className="txt-compact-xlarge-plus hover:text-ui-fg-base uppercase"
+              className=" hover:text-ui-fg-base uppercase"
               data-testid="nav-store-link"
             >
-              Medusa Store
+              <div style={{ fontFamily: `${gilda.style.fontFamily} !important` }}></div>
+              Art of Gifts
             </LocalizedClientLink>
           </div>
 
@@ -38,7 +42,7 @@ export default async function Nav() {
                   scroll={false}
                   data-testid="nav-search-link"
                 >
-                  Search
+                  Suche
                 </LocalizedClientLink>
               )}
               <LocalizedClientLink
@@ -46,7 +50,7 @@ export default async function Nav() {
                 href="/account"
                 data-testid="nav-account-link"
               >
-                Account
+                Konto
               </LocalizedClientLink>
             </div>
             <Suspense
@@ -56,7 +60,7 @@ export default async function Nav() {
                   href="/cart"
                   data-testid="nav-cart-link"
                 >
-                  Cart (0)
+                  Warenkorb (0)
                 </LocalizedClientLink>
               }
             >
