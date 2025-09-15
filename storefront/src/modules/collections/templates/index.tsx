@@ -24,7 +24,7 @@ export default function CollectionTemplate({
     <div className="flex flex-col small:flex-row small:items-start py-6 content-container">
       
       <div className="w-full">
-        <div className="flex justify-between">
+        <div className="flex justify-between mb-4">
           <h1>{collection.title}</h1>
           <RefinementList sortBy={sort} />
         </div>

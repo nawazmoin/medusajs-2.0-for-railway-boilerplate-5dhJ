@@ -8,9 +8,9 @@ import { getCategoriesList } from "@lib/data/categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "Medusa Next.js Starter Template",
+  title: "Art of Gifts - Home",
   description:
-    "A performant frontend ecommerce starter template with Next.js 14 and Medusa.",
+    "Entdecken Sie einzigartige Geschenke für jeden Anlass bei Art of Gifts. Von personalisierten Artikeln bis hin zu handgefertigten Schätzen - finden Sie das perfekte Geschenk, das Herzen berührt.",
 }
 
 export default async function Home({
