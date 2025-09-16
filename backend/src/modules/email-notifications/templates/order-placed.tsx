@@ -21,14 +21,14 @@ export const isOrderPlacedTemplateData = (data: any): data is OrderPlacedTemplat
 
 export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
   PreviewProps: OrderPlacedPreviewProps
-} = ({ order, shippingAddress, preview = 'Your order has been placed!' }) => {
+} = ({ order, shippingAddress, preview = 'Ihre Bestellung wurde bestätigt!' }) => {
   const totalText = `${order.summary.raw_current_order_total.value} ${order.currency_code}`
 
   return (
     <Base preview={preview}>
       <Section>
         <Text style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center', margin: '0 0 30px' }}>
-          Order Confirmed — Art Of Gifts
+          Bestellbestätigung — Art Of Gifts
         </Text>
 
         <div
@@ -41,10 +41,10 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
           }}
         >
           <Text style={{ margin: '0 0 10px' }}>
-            Dear {shippingAddress.first_name} {shippingAddress.last_name},
+            Hallo {shippingAddress.first_name} {shippingAddress.last_name},
           </Text>
           <Text style={{ margin: 0 }}>
-            Thank you for your order with <strong>Art Of Gifts</strong>! You will receive the payment instructions shortly via email. Please keep an eye on your inbox (and spam folder).
+            Vielen Dank für Ihre Bestellung bei <strong>Art Of Gifts</strong>! Die Zahlungsanweisungen erhalten Sie in Kürze per E‑Mail. Bitte prüfen Sie auch Ihren Spam‑Ordner.
           </Text>
         </div>
 
@@ -56,10 +56,10 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
             marginBottom: 24,
           }}
         >
-          <Text style={{ fontSize: 16, fontWeight: 'bold', margin: '0 0 8px' }}>Order Summary</Text>
-          <Text style={{ margin: '0 0 6px' }}>Order ID: {order.display_id}</Text>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', margin: '0 0 8px' }}>Bestellübersicht</Text>
+          <Text style={{ margin: '0 0 6px' }}>Bestellnummer: {order.display_id}</Text>
           <Text style={{ margin: '0 0 6px' }}>
-            Order Date: {new Date(order.created_at).toLocaleDateString()}
+            Bestelldatum: {new Date(order.created_at).toLocaleDateString('de-DE')}
           </Text>
 
           <div
@@ -74,7 +74,7 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
               marginTop: 8,
             }}
           >
-            <Text style={{ margin: 0, fontWeight: 500 }}>Total</Text>
+            <Text style={{ margin: 0, fontWeight: 500 }}>Gesamtsumme</Text>
             <Text style={{ margin: 0, fontSize: 18, fontWeight: 'bold' }}>{totalText}</Text>
           </div>
         </div>
@@ -82,7 +82,7 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
         <Hr style={{ margin: '20px 0' }} />
 
         <Text style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 10px' }}>
-          Shipping Address
+          Lieferadresse
         </Text>
         <Text style={{ margin: '0 0 5px' }}>{shippingAddress.address_1}</Text>
         <Text style={{ margin: '0 0 5px' }}>
@@ -93,7 +93,7 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
         <Hr style={{ margin: '20px 0' }} />
 
         <Text style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 15px' }}>
-          Order Items
+          Artikel
         </Text>
 
         <div
@@ -116,9 +116,9 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
               fontWeight: 600,
             }}
           >
-            <Text style={{ margin: 0 }}>Item</Text>
-            <Text style={{ margin: 0 }}>Quantity</Text>
-            <Text style={{ margin: 0 }}>Price</Text>
+            <Text style={{ margin: 0 }}>Artikel</Text>
+            <Text style={{ margin: 0 }}>Menge</Text>
+            <Text style={{ margin: 0 }}>Preis</Text>
           </div>
           {order.items.map((item) => (
             <div
@@ -138,7 +138,7 @@ export const OrderPlacedTemplate: React.FC<OrderPlacedTemplateProps> & {
         </div>
 
         <Text style={{ marginTop: 24, color: '#6b7280' }}>
-          This email confirms your order with Art Of Gifts. You will receive a separate email with payment instructions. If you have any questions, just reply to this email.
+          Diese E‑Mail bestätigt Ihre Bestellung bei Art Of Gifts. Die Zahlungsanweisungen erhalten Sie separat. Bei Fragen antworten Sie einfach auf diese E‑Mail.
         </Text>
       </Section>
     </Base>
@@ -151,30 +151,30 @@ OrderPlacedTemplate.PreviewProps = {
     display_id: 'ORD-123',
     created_at: new Date().toISOString(),
     email: 'test@example.com',
-    currency_code: 'USD',
+    currency_code: 'EUR',
     items: [
-      { id: 'item-1', title: 'Item 1', product_title: 'Product 1', quantity: 2, unit_price: 10 },
-      { id: 'item-2', title: 'Item 2', product_title: 'Product 2', quantity: 1, unit_price: 25 }
+      { id: 'item-1', title: 'Artikel 1', product_title: 'Produkt 1', quantity: 2, unit_price: 10 },
+      { id: 'item-2', title: 'Artikel 2', product_title: 'Produkt 2', quantity: 1, unit_price: 25 }
     ],
     shipping_address: {
-      first_name: 'Test',
-      last_name: 'User',
-      address_1: '123 Main St',
-      city: 'Anytown',
-      province: 'CA',
+      first_name: 'Max',
+      last_name: 'Mustermann',
+      address_1: 'Musterstraße 1',
+      city: 'Musterstadt',
+      province: 'BY',
       postal_code: '12345',
-      country_code: 'US'
+      country_code: 'DE'
     },
     summary: { raw_current_order_total: { value: 45 } }
   },
   shippingAddress: {
-    first_name: 'Test',
-    last_name: 'User',
-    address_1: '123 Main St',
-    city: 'Anytown',
-    province: 'CA',
+    first_name: 'Max',
+    last_name: 'Mustermann',
+    address_1: 'Musterstraße 1',
+    city: 'Musterstadt',
+    province: 'BY',
     postal_code: '12345',
-    country_code: 'US'
+    country_code: 'DE'
   }
 } as OrderPlacedPreviewProps
 
