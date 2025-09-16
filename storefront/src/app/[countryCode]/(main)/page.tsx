@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 
-import FeaturedProducts from "@modules/home/components/featured-products"
+import Bestsellers from "@modules/home/components/bestsellers"
 import Hero from "@modules/home/components/hero"
 import { getCollectionsWithProducts } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
@@ -48,9 +48,10 @@ export default async function Home({
         </div>
       )}
       <Hero />
-      <div className="py-12">
+      <div className="py-4">
         <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
+          {/* Replace collections with Bestsellers */}
+          <Bestsellers countryCode={countryCode} region={region} categoryHandle="bestseller" />
         </ul>
       </div>
     </>
