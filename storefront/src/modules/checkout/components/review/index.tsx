@@ -40,8 +40,7 @@ const Review = ({ cart }: { cart: any }) => {
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
                 Durch Klicken auf die Schaltfläche „Bestellung aufgeben“ bestätigen Sie, dass Sie
                 unsere Nutzungsbedingungen, Verkaufsbedingungen und
-                Rückgabebedingungen gelesen und verstanden haben und akzeptieren und dass Sie die Datenschutzerklärung von Medusa
-                Store gelesen haben.
+                Rückgabebedingungen gelesen und verstanden haben und akzeptieren und dass Sie die Datenschutzerklärung von Art Of Gifts Store gelesen haben.
               </Text>
             </div>
           </div>
