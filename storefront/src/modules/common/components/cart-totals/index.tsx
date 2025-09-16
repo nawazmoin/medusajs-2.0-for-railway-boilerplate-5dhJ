@@ -6,6 +6,7 @@ import { Tooltip } from "@medusajs/ui"
 import React from "react"
 
 type CartTotalsProps = {
+  summary?: boolean,
   totals: {
     total?: number | null
     subtotal?: number | null
@@ -17,7 +18,7 @@ type CartTotalsProps = {
   }
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ totals, summary }) => {
   const {
     currency_code,
     total,
@@ -32,12 +33,18 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
     <div>
       <div className="flex flex-col gap-y-2 txt-medium text-ui-fg-subtle ">
         <div className="flex items-center justify-between">
-          <span className="flex gap-x-1 items-center">
+          {!summary && <span className="flex gap-x-1 items-center">
             Zwischensumme (ohne Versandkosten)
-          </span>
-          <span data-testid="cart-subtotal" data-value={subtotal || 0}>
-            {convertToLocale({ amount: subtotal ?? 0, currency_code })}
-          </span>
+          </span>}
+          {summary && <span className="flex gap-x-1 items-center">
+            Zwischensumme 
+          </span>}
+          {!summary && <span data-testid="cart-subtotal" data-value={total || 0}>
+            {convertToLocale({ amount: total ?? 0, currency_code })}
+          </span>}
+          {summary && <span data-testid="cart-subtotal" data-value={(subtotal ?? 0) + (shipping_total ?? 0)}>
+            {convertToLocale({ amount: (subtotal ?? 0) + (shipping_total ?? 0), currency_code })}
+          </span>}
         </div>
         {!!discount_total && (
           <div className="flex items-center justify-between">
