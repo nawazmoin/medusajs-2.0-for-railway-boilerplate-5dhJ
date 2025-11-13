@@ -108,3 +108,11 @@ export const WORKER_MODE =
  * Disable Admin
  */
 export const SHOULD_DISABLE_ADMIN = process.env.MEDUSA_DISABLE_ADMIN === 'true'
+
+/**
+ * Cloudflare R2 configuration for file storage
+ */
+export const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID;
+export const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
+export const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
+export const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL;

@@ -22,10 +22,14 @@ import {
     MINIO_BUCKET,
     MEILISEARCH_HOST,
     MEILISEARCH_ADMIN_KEY,
-    // Added PayPal constants
     PAYPAL_CLIENT_ID,
     PAYPAL_CLIENT_SECRET,
     PAYPAL_ENVIRONMENT,
+    // Add R2 imports
+    R2_ACCOUNT_ID,
+    R2_ACCESS_KEY_ID,
+    R2_SECRET_ACCESS_KEY,
+    R2_PUBLIC_URL,
 } from 'lib/constants';
 
 loadEnv(process.env.NODE_ENV, process.cwd());
@@ -58,16 +62,31 @@ const medusaConfig = {
             resolve: '@medusajs/file',
             options: {
                 providers: [
-                    ...(MINIO_ENDPOINT && MINIO_ACCESS_KEY && MINIO_SECRET_KEY ? [{
+                    // Priority 1: Use R2 if configured
+                    ...(R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY && R2_PUBLIC_URL ? [{
+                        resolve: 'medusa-file-r2',
+                        id: 'r2',
+                        options: {
+                            account_id: R2_ACCOUNT_ID,
+                            access_key_id: R2_ACCESS_KEY_ID,
+                            secret_access_key: R2_SECRET_ACCESS_KEY,
+                            bucket: 'medusa-media',
+                            public_url: R2_PUBLIC_URL,
+                        }
+                    }] : 
+                    // Priority 2: Fallback to MinIO if configured
+                    MINIO_ENDPOINT && MINIO_ACCESS_KEY && MINIO_SECRET_KEY ? [{
                         resolve: './src/modules/minio-file',
                         id: 'minio',
                         options: {
                             endPoint: MINIO_ENDPOINT,
                             accessKey: MINIO_ACCESS_KEY,
                             secretKey: MINIO_SECRET_KEY,
-                            bucket: MINIO_BUCKET // Optional, default: medusa-media
+                            bucket: MINIO_BUCKET
                         }
-                    }] : [{
+                    }] : 
+                    // Priority 3: Fallback to local storage
+                    [{
                         resolve: '@medusajs/file-local',
                         id: 'local',
                         options: {
@@ -121,13 +140,11 @@ const medusaConfig = {
                 ]
             }
         }] : []),
-        // Payment module enabled if Stripe or PayPal is configured
         ...(((STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET) || (PAYPAL_CLIENT_ID && PAYPAL_CLIENT_SECRET && PAYPAL_ENVIRONMENT)) ? [{
             key: Modules.PAYMENT,
             resolve: '@medusajs/payment',
             options: {
                 providers: [
-                    // Stripe provider (optional)
                     ...(STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET ? [{
                         resolve: '@medusajs/payment-stripe',
                         id: 'stripe',
@@ -136,14 +153,13 @@ const medusaConfig = {
                             webhookSecret: STRIPE_WEBHOOK_SECRET,
                         },
                     }] : []),
-                    // PayPal provider (optional)
                     ...(PAYPAL_CLIENT_ID && PAYPAL_CLIENT_SECRET && PAYPAL_ENVIRONMENT ? [{
                         resolve: '@rsc-labs/medusa-paypal-payment/providers/paypal-payment',
                         id: 'paypal-payment',
                         options: {
                             oAuthClientId: PAYPAL_CLIENT_ID,
                             oAuthClientSecret: PAYPAL_CLIENT_SECRET,
-                            environment: PAYPAL_ENVIRONMENT, // 'sandbox' | 'live'
+                            environment: PAYPAL_ENVIRONMENT,
                         },
                     }] : []),
                 ],
@@ -151,7 +167,6 @@ const medusaConfig = {
         }] : [])
     ],
     plugins: [
-        // Keep Meilisearch plugin conditional
         ...(MEILISEARCH_HOST && MEILISEARCH_ADMIN_KEY ? [{
             resolve: '@rokmohar/medusa-plugin-meilisearch',
             options: {
@@ -174,7 +189,6 @@ const medusaConfig = {
                 }
             }
         }] : []),
-
     ]
 };
 

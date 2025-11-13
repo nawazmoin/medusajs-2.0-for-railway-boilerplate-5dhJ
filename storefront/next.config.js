@@ -18,7 +18,6 @@ const nextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
-        
       },
       { // Note: needed to serve images from /public folder
         protocol: process.env.NEXT_PUBLIC_BASE_URL?.startsWith('https') ? 'https' : 'http',
@@ -28,6 +27,14 @@ const nextConfig = {
         protocol: "https",
         hostname: process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL?.replace('https://', ''),
       },
+      { // Note: Cloudflare R2 storage (NEW)
+        protocol: "https",
+        hostname: "pub-*.r2.dev",
+      },
+      ...(process.env.NEXT_PUBLIC_MINIO_ENDPOINT ? [{ // Note: MinIO bucket storage (fallback for existing images)
+        protocol: "https",
+        hostname: process.env.NEXT_PUBLIC_MINIO_ENDPOINT,
+      }] : []),
       { // Note: can be removed after deleting demo products
         protocol: "https",
         hostname: "medusa-public-images.s3.eu-west-1.amazonaws.com",
@@ -40,11 +47,8 @@ const nextConfig = {
         protocol: "https",
         hostname: "medusa-server-testing.s3.us-east-1.amazonaws.com",
       },
-      ...(process.env.NEXT_PUBLIC_MINIO_ENDPOINT ? [{ // Note: needed when using MinIO bucket storage for media
-        protocol: "https",
-        hostname: process.env.NEXT_PUBLIC_MINIO_ENDPOINT,
-      }] : []),
     ],
+    formats: ['image/webp', 'image/avif'],
   },
   serverRuntimeConfig: {
     port: process.env.PORT || 3000
