@@ -2,6 +2,7 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client
 import { AbstractFileProviderService } from "@medusajs/framework/utils";
 import {
   Logger,
+  ModuleProviderExports,
   ProviderUploadFileDTO,
   ProviderDeleteFileDTO,
   ProviderGetFileDTO,
@@ -20,7 +21,7 @@ type R2FileOptions = {
   public_url: string;
 };
 
-class R2FileService extends AbstractFileProviderService {
+export class R2FileService extends AbstractFileProviderService {
   static identifier = "r2-file";
 
   protected client_: S3Client;
@@ -93,7 +94,10 @@ class R2FileService extends AbstractFileProviderService {
   }
 }
 
-// Export as services array
-export const services = [R2FileService];
+const services = [R2FileService];
 
-export default R2FileService;
+const providerExport: ModuleProviderExports = {
+  services,
+};
+
+export default providerExport;
