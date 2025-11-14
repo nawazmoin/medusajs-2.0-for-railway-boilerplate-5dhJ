@@ -1,6 +1,12 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { AbstractFileProviderService } from "@medusajs/framework/utils";
-import { Logger } from "@medusajs/framework/types";
+import {
+  Logger,
+  ProviderUploadFileDTO,
+  ProviderDeleteFileDTO,
+  ProviderGetFileDTO,
+  ProviderFileResultDTO
+} from "@medusajs/framework/types";
 
 type InjectedDependencies = {
   logger: Logger;
@@ -40,35 +46,48 @@ class R2FileService extends AbstractFileProviderService {
     });
   }
 
-  async upload(file: Express.Multer.File): Promise<{ url: string; key: string }> {
+  async upload(file: ProviderUploadFileDTO): Promise<ProviderFileResultDTO> {
     try {
-      const key = `${Date.now()}-${file.originalname}`;
+      const key = `${Date.now()}-${file.filename}`;
 
       await this.client_.send(
         new PutObjectCommand({
           Bucket: this.bucket_,
           Key: key,
-          Body: file.buffer,
-          ContentType: file.mimetype,
+          Body: file.content,
+          ContentType: file.mimeType,
         })
       );
 
       const url = `${this.publicUrl_}/${key}`;
 
       return { url, key };
-    } catch (error) {
+    } catch (error: any) {
       this.logger_.error(`Error uploading file to R2: ${error.message}`);
       throw error;
     }
   }
 
-  async delete(fileKey: string): Promise<void> {
-    // Implement delete if needed
-    this.logger_.info(`Delete file: ${fileKey}`);
+  async delete(file: ProviderDeleteFileDTO | ProviderDeleteFileDTO[]): Promise<void> {
+    const files = Array.isArray(file) ? file : [file];
+
+    try {
+      for (const f of files) {
+        await this.client_.send(
+          new DeleteObjectCommand({
+            Bucket: this.bucket_,
+            Key: f.fileKey,
+          })
+        );
+      }
+    } catch (error: any) {
+      this.logger_.error(`Error deleting file from R2: ${error.message}`);
+      throw error;
+    }
   }
 
-  async getPresignedDownloadUrl(fileKey: string): Promise<string> {
-    return `${this.publicUrl_}/${fileKey}`;
+  async getPresignedDownloadUrl(fileData: ProviderGetFileDTO): Promise<string> {
+    return `${this.publicUrl_}/${fileData.fileKey}`;
   }
 }
 
