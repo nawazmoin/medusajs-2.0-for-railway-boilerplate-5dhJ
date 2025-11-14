@@ -63,10 +63,9 @@ const medusaConfig = {
             resolve: '@medusajs/file',
             options: {
                 providers: [
-                    // Priority 1: Use R2 if configured
-                    ...(R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY && R2_PUBLIC_URL ? [{
+                    {
                         resolve: '@medusajs/file-s3',
-                        id: 'r2',
+                        id: 's3',
                         options: {
                             file_url: R2_PUBLIC_URL,
                             access_key_id: R2_ACCESS_KEY_ID,
@@ -75,27 +74,7 @@ const medusaConfig = {
                             bucket: 'medusa-media',
                             endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
                         }
-                    }] : 
-                    // Priority 2: Fallback to MinIO if configured
-                    MINIO_ENDPOINT && MINIO_ACCESS_KEY && MINIO_SECRET_KEY ? [{
-                        resolve: './src/modules/minio-file',
-                        id: 'minio',
-                        options: {
-                            endPoint: MINIO_ENDPOINT,
-                            accessKey: MINIO_ACCESS_KEY,
-                            secretKey: MINIO_SECRET_KEY,
-                            bucket: MINIO_BUCKET
-                        }
-                    }] : 
-                    // Priority 3: Fallback to local storage
-                    [{
-                        resolve: '@medusajs/file-local',
-                        id: 'local',
-                        options: {
-                            upload_dir: 'static',
-                            backend_url: `${BACKEND_URL}/static`
-                        }
-                    }])
+                    }
                 ]
             }
         },
