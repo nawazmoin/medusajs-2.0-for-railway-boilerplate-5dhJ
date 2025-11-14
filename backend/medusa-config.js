@@ -57,7 +57,8 @@ const medusaConfig = {
         backendUrl: BACKEND_URL,
         disable: SHOULD_DISABLE_ADMIN,
     },
-    modules: [{
+    modules: [
+        {
             key: Modules.FILE,
             resolve: '@medusajs/file',
             options: {
@@ -67,11 +68,12 @@ const medusaConfig = {
                         resolve: '@medusajs/file-s3',
                         id: 'r2',
                         options: {
-                            account_id: R2_ACCOUNT_ID,
+                            file_url: R2_PUBLIC_URL,
                             access_key_id: R2_ACCESS_KEY_ID,
                             secret_access_key: R2_SECRET_ACCESS_KEY,
+                            region: 'auto',
                             bucket: 'medusa-media',
-                            public_url: R2_PUBLIC_URL,
+                            endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
                         }
                     }] : 
                     // Priority 2: Fallback to MinIO if configured
