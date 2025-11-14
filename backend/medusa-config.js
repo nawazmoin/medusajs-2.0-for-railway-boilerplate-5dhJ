@@ -67,12 +67,13 @@ const medusaConfig = {
                         resolve: '@medusajs/file-s3',
                         id: 's3',
                         options: {
-                            file_url: R2_PUBLIC_URL,
+                            file_url: 'https://pub-41e0f453538b43ba89b1ad3707c8ed4c.r2.dev',
                             access_key_id: R2_ACCESS_KEY_ID,
                             secret_access_key: R2_SECRET_ACCESS_KEY,
                             region: 'auto',
                             bucket: 'medusa-media',
-                            endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+                            endpoint: 'https://b9fc34201c2995d57e0c26c9b49be143.r2.cloudflarestorage.com',
+                            s3_force_path_style: false,
                         }
                     }
                 ]
