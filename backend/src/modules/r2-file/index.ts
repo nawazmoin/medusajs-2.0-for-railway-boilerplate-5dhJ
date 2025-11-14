@@ -21,6 +21,8 @@ type R2FileOptions = {
 };
 
 class R2FileService extends AbstractFileProviderService {
+  static identifier = "r2-file";
+
   protected client_: S3Client;
   protected bucket_: string;
   protected publicUrl_: string;
@@ -90,5 +92,8 @@ class R2FileService extends AbstractFileProviderService {
     return `${this.publicUrl_}/${fileData.fileKey}`;
   }
 }
+
+// Export as services array
+export const services = [R2FileService];
 
 export default R2FileService;
