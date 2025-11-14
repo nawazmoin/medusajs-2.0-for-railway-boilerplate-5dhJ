@@ -42,6 +42,7 @@ export class R2FileService extends AbstractFileProviderService {
     this.client_ = new S3Client({
       region: "auto",
       endpoint: `https://${options.account_id}.r2.cloudflarestorage.com`,
+      forcePathStyle: true,
       credentials: {
         accessKeyId: options.access_key_id,
         secretAccessKey: options.secret_access_key,
