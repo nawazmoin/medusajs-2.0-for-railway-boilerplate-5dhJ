@@ -21,6 +21,7 @@
     "email:dev": "email dev --dir=./src/modules/email-notifications/templates --port=3002"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.931.0",
     "@medusajs/admin-sdk": "2.8.8",
     "@medusajs/cli": "2.8.8",
     "@medusajs/dashboard": "2.8.8",
@@ -38,7 +39,6 @@
     "@rokmohar/medusa-plugin-meilisearch": "1.2.3",
     "@rsc-labs/medusa-paypal-payment": "^0.0.2",
     "awilix": "^8.0.1",
-    "medusa-file-r2": "^0.0.2",
     "medusajs-launch-utils": "^0.0.17",
     "minio": "^8.0.3",
     "pg": "^8.13.1",

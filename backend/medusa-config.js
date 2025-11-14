@@ -64,7 +64,7 @@ const medusaConfig = {
             options: {
                 providers: [
                     {
-                        resolve: 'medusa-file-r2',
+                        resolve: './src/modules/r2-file',
                         id: 'r2',
                         options: {
                             account_id: R2_ACCOUNT_ID,
