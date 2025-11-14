@@ -64,7 +64,7 @@ const medusaConfig = {
                 providers: [
                     // Priority 1: Use R2 if configured
                     ...(R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY && R2_PUBLIC_URL ? [{
-                        resolve: 'medusa-file-r2',
+                        resolve: '@medusajs/file-s3',
                         id: 'r2',
                         options: {
                             account_id: R2_ACCOUNT_ID,
