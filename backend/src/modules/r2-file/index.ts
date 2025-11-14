@@ -1,5 +1,5 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { AbstractFileProviderService } from "@medusajs/framework/utils";
+import { AbstractFileProviderService, MedusaError } from "@medusajs/framework/utils";
 import {
   Logger,
   ModuleProviderExports,
@@ -23,6 +23,24 @@ type R2FileOptions = {
 
 export class R2FileService extends AbstractFileProviderService {
   static identifier = "r2-file";
+  static validateOptions(options: Record<string, any>) {
+    const requiredFields = [
+      "account_id",
+      "access_key_id",
+      "secret_access_key",
+      "bucket",
+      "public_url"
+    ];
+
+    for (const field of requiredFields) {
+      if (!options?.[field]) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `${field} is required in the provider's options`
+        );
+      }
+    }
+  }
 
   protected client_: S3Client;
   protected bucket_: string;
@@ -35,9 +53,11 @@ export class R2FileService extends AbstractFileProviderService {
   ) {
     super();
 
+    R2FileService.validateOptions(options);
+
     this.logger_ = logger;
     this.bucket_ = options.bucket;
-    this.publicUrl_ = options.public_url;
+    this.publicUrl_ = options.public_url.replace(/\/$/, "");
 
     this.client_ = new S3Client({
       region: "auto",
