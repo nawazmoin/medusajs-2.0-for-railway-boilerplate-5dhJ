@@ -56,18 +56,26 @@ export class R2FileService extends AbstractFileProviderService {
     R2FileService.validateOptions(options);
 
     this.logger_ = logger;
-    this.bucket_ = options.bucket;
-    this.publicUrl_ = options.public_url.replace(/\/$/, "");
+    const accountId = options.account_id.trim();
+    const accessKey = options.access_key_id.trim();
+    const secretKey = options.secret_access_key.trim();
+    const bucket = options.bucket.trim();
+    const publicUrl = options.public_url.trim().replace(/\/$/, "");
+
+    this.bucket_ = bucket;
+    this.publicUrl_ = publicUrl;
 
     this.client_ = new S3Client({
       region: "auto",
-      endpoint: `https://${options.account_id}.r2.cloudflarestorage.com`,
+      endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
       forcePathStyle: true,
       credentials: {
-        accessKeyId: options.access_key_id,
-        secretAccessKey: options.secret_access_key,
+        accessKeyId: accessKey,
+        secretAccessKey: secretKey,
       },
     });
+
+    this.logger_.debug?.(`Initialized R2FileService with bucket ${bucket} at endpoint https://${accountId}.r2.cloudflarestorage.com`);
   }
 
   async upload(file: ProviderUploadFileDTO): Promise<ProviderFileResultDTO> {
