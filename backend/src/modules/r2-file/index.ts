@@ -33,7 +33,8 @@ export class R2FileService extends AbstractFileProviderService {
     ];
 
     for (const field of requiredFields) {
-      if (!options?.[field]) {
+      const value = options?.[field];
+      if (typeof value !== "string" || !value.trim()) {
         throw new MedusaError(
           MedusaError.Types.INVALID_DATA,
           `${field} is required in the provider's options`
