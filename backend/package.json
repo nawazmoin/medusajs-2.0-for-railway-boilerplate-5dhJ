@@ -20,6 +20,11 @@
     "dev": "medusa develop",
     "email:dev": "email dev --dir=./src/modules/email-notifications/templates --port=3002"
   },
+  "pnpm": {
+    "overrides": {
+      "next@<15.1.11": "15.1.11"
+    }
+  },
   "dependencies": {
     "@medusajs/admin-sdk": "2.8.8",
     "@medusajs/cli": "2.8.8",
